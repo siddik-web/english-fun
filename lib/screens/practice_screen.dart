@@ -9,6 +9,8 @@ import '../data/word_pairs_data.dart';
 import '../models/word_pair.dart';
 import '../services/tts_service.dart';
 import '../services/stt_service.dart';
+import '../services/gamification_service.dart';
+import '../models/achievement.dart';
 import '../services/progress_provider.dart';
 import '../services/gemini_service.dart';
 import '../services/openai_service.dart';
@@ -17,6 +19,7 @@ import '../widgets/word_card.dart';
 import '../widgets/listen_button.dart';
 import '../widgets/record_button.dart';
 import '../widgets/feedback_overlay.dart';
+import '../widgets/achievement_overlay.dart';
 
 class PracticeScreen extends StatefulWidget {
   final String category;
@@ -136,6 +139,17 @@ class _PracticeScreenState extends State<PracticeScreen> {
     _checkAnswer(index);
   }
 
+  Achievement? _unlockedAchievement;
+
+  void _processGamification(bool isCorrect) async {
+    final achievement = await context.read<GamificationService>().addStar(correct: isCorrect);
+    if (achievement != null && mounted) {
+      setState(() {
+        _unlockedAchievement = achievement;
+      });
+    }
+  }
+
   void _checkAnswer(int selectedIndex) {
     final progress = context.read<ProgressProvider>();
     final isCorrect = selectedIndex == _targetWordIndex;
@@ -150,8 +164,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
 
     if (isCorrect) {
       progress.recordCorrectAnswer();
+      _processGamification(true);
     } else {
       progress.recordIncorrectAnswer();
+      _processGamification(false);
     }
   }
 
@@ -172,8 +188,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
 
     if (isCorrect) {
       progress.recordCorrectAnswer();
+      _processGamification(true);
     } else {
       progress.recordIncorrectAnswer();
+      _processGamification(false);
     }
   }
 
@@ -434,13 +452,28 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildNavButton(
-                          icon: Icons.arrow_back_rounded,
-                          onTap: () => Navigator.of(context).pop(),
+                        Row(
+                          children: [
+                            _buildNavButton(
+                              icon: Icons.arrow_back_rounded,
+                              onTap: () => Navigator.of(context).pop(),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildStarCounter(),
+                          ],
                         ),
-                        Text(
-                          widget.category,
-                          style: AppTheme.titleStyle,
+                        // Flexible title to prevent overflow
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              widget.category,
+                              style: AppTheme.titleStyle.copyWith(fontSize: 20),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                         _buildGenerateButton(),
                       ],
@@ -468,7 +501,6 @@ class _PracticeScreenState extends State<PracticeScreen> {
 
                         const Spacer(flex: 1),
 
-                        // Word Cards
                         // Word Cards
                         Expanded(
                           flex: 5,
@@ -527,8 +559,53 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 mouthHint: _mouthHint,
                 onComplete: _onFeedbackComplete,
               ),
+
+            // Achievement Overlay
+            if (_unlockedAchievement != null)
+              AchievementOverlay(
+                achievement: _unlockedAchievement!,
+                onDismiss: () {
+                  setState(() {
+                    _unlockedAchievement = null;
+                  });
+                },
+              ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStarCounter() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+          const SizedBox(width: 4),
+          Consumer<GamificationService>(
+            builder: (context, gameService, _) => Text(
+              '${gameService.totalStars}',
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.darkText,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

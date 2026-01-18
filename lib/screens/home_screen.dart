@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../config/theme.dart';
 import '../widgets/category_card.dart';
+import '../services/gamification_service.dart';
+import '../models/achievement.dart';
 import 'practice_screen.dart';
 import 'settings_screen.dart';
 
@@ -68,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    _buildTrophyButton(context),
+                    const SizedBox(width: 12),
                     _buildSettingsButton(context),
                   ],
                 ),
@@ -192,6 +197,110 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           color: AppTheme.darkText,
           size: 28,
         ),
+      ),
+    );
+  }
+
+  Widget _buildTrophyButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showAchievementsDialog(context),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: AppTheme.glassDecoration,
+        child: const Icon(
+          Icons.emoji_events_rounded,
+          color: Colors.amber,
+          size: 28,
+        ),
+      ),
+    );
+  }
+
+  void _showAchievementsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Row(
+          children: [
+            Icon(Icons.emoji_events_rounded, color: Colors.amber, size: 32),
+            SizedBox(width: 8),
+            Text('Your Trophies', style: AppTheme.headingStyle),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Consumer<GamificationService>(
+            builder: (context, gameService, _) {
+              final achievements = gameService.achievements;
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: achievements.length,
+                itemBuilder: (context, index) {
+                  final achievement = achievements[index];
+                  return Opacity(
+                    opacity: achievement.isUnlocked ? 1.0 : 0.5,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: achievement.isUnlocked 
+                            ? achievement.color.withOpacity(0.1) 
+                            : Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: achievement.isUnlocked 
+                              ? achievement.color 
+                              : Colors.grey.withOpacity(0.3),
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            achievement.isUnlocked ? achievement.icon : Icons.lock,
+                            color: achievement.isUnlocked ? achievement.color : Colors.grey,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  achievement.title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: achievement.isUnlocked ? AppTheme.darkText : Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  achievement.description,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: achievement.isUnlocked ? AppTheme.mediumText : Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

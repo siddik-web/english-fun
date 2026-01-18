@@ -9,9 +9,13 @@ import 'services/stt_service.dart';
 import 'services/progress_provider.dart';
 import 'services/gemini_service.dart';
 import 'services/openai_service.dart';
+import 'services/gamification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Gamification Service
+  await GamificationService.instance.initialize();
   
   // Try to load saved settings first
   try {
@@ -59,6 +63,7 @@ class EnglishPracticeApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProgressProvider()),
+        ChangeNotifierProvider.value(value: GamificationService.instance),
         Provider(create: (_) => TTSService()),
         Provider(create: (_) => STTService()),
       ],
