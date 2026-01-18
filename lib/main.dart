@@ -10,12 +10,14 @@ import 'services/progress_provider.dart';
 import 'services/gemini_service.dart';
 import 'services/openai_service.dart';
 import 'services/gamification_service.dart';
+import 'services/cache_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Gamification Service
+  // Initialize Services
   await GamificationService.instance.initialize();
+  await CacheService.instance.initialize();
   
   // Try to load saved settings first
   try {

@@ -10,6 +10,7 @@ import '../models/word_pair.dart';
 import '../services/tts_service.dart';
 import '../services/stt_service.dart';
 import '../services/gamification_service.dart';
+import '../services/cache_service.dart';
 import '../models/achievement.dart';
 import '../services/progress_provider.dart';
 import '../services/gemini_service.dart';
@@ -55,14 +56,41 @@ class _PracticeScreenState extends State<PracticeScreen> {
     _pairs.shuffle();
     _selectRandomTarget();
     
+    // Initial setup
     _ttsService = context.read<TTSService>();
     _sttService = context.read<STTService>();
     
     _sttSubscription = _sttService.recognizedWords.listen(_onSpeechResult);
     _sttStatusSubscription = _sttService.statusStream.listen(_onSTTStatus);
     
-    // Check permissions before initializing
+    // Load pairs (static + cached)
+    _loadAllPairs();
+    
+    // Check permissions
     _checkPermissionAndInitialize();
+  }
+
+  Future<void> _loadAllPairs() async {
+    // 1. Get static pairs
+    final staticPairs = WordPairsData.getPairsByCategory(widget.category);
+    
+    // 2. Get cached pairs
+    final cachedPairs = await CacheService.instance.loadPairs(widget.category);
+    
+    if (mounted) {
+      setState(() {
+        // Combine and shuffle
+        _pairs = [...staticPairs, ...cachedPairs];
+        _pairs.shuffle();
+        
+        // Reset if we were previously empty (unlikely given static data, but good practice)
+        if (_currentPairIndex >= _pairs.length) {
+          _currentPairIndex = 0;
+        }
+        
+        _selectRandomTarget();
+      });
+    }
   }
 
   Future<void> _checkPermissionAndInitialize() async {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../models/word_pair.dart';
+import '../services/cache_service.dart';
 
 /// Service for generating word pairs using Google's Gemini API
 class GeminiService {
@@ -72,7 +73,10 @@ class GeminiService {
           throw Exception('Empty response from Gemini API');
         }
         
-        return _parseResponse(text, category);
+        final pairs = _parseResponse(text, category);
+        // Save to cache
+        await CacheService.instance.savePairs(category, pairs);
+        return pairs;
       } catch (e) {
         final errorStr = e.toString().toLowerCase();
         

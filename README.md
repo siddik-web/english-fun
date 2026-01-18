@@ -27,13 +27,24 @@ A Flutter mobile application designed for Grade 1 students to practice English p
 
 ### 🔊 Audio Features
 - **Text-to-Speech**: Native pronunciation for all words
-- **Speech Recognition**: Record your voice and get instant feedback!
+- **Speech Recognition**: Record your voice and master pronunciation with instant AI feedback! 🎙️
 - **Audio Hints**: Mouth position guidance for each sound
+
+### 🏆 Gamification
+- **Stars & Levels**: Earn stars for every correct pair mastered
+- **Daily Streaks**: Build your learning habit with daily streak tracking
+- **Achievements**: Unlock colorful badges and trophies as you progress 🏆
+- **Trophy Room**: View all your earned achievements from the home screen
+
+### 💾 Offline Support
+- **AI Word Caching**: All AI-generated words are saved locally for offline practice
+- **Hybrid Content**: Seamlessly mixes static word pairs with your personal AI history
+- **Cache Management**: Easily clear offline content in app settings
 
 ### 📊 Progress Tracking
 - **Visual Progress**: Track completion across categories
 - **Score System**: Earn points for correct answers
-- **Persistent Data**: Progress saved locally
+- **Persistent Data**: Progress saved locally using CacheService
 
 ## Getting Started
 
@@ -105,7 +116,8 @@ lib/
 ├── data/
 │   └── word_pairs_data.dart    # 300+ static word pairs
 ├── models/
-│   └── word_pair.dart          # WordPair data model
+│   ├── word_pair.dart          # WordPair data model
+│   └── achievement.dart        # Gamification model
 ├── screens/
 │   ├── home_screen.dart        # Main category selection
 │   ├── practice_screen.dart    # Practice exercises
@@ -113,12 +125,15 @@ lib/
 ├── services/
 │   ├── gemini_service.dart     # Google Gemini integration
 │   ├── openai_service.dart     # OpenAI integration
+│   ├── cache_service.dart      # Offline persistence
+│   ├── gamification_service.dart # Stars, streaks, and badges
 │   ├── tts_service.dart        # Text-to-speech
 │   ├── stt_service.dart        # Speech-to-text integration
 │   └── progress_provider.dart  # Progress tracking
 ├── widgets/
 │   ├── category_card.dart      # Category selection cards
 │   ├── word_card.dart          # Word display cards
+│   ├── achievement_overlay.dart # Animated unlock notifications
 │   ├── record_button.dart      # Voice recording button
 │   ├── listen_button.dart      # Audio playback button
 │   ├── feedback_overlay.dart   # Answer feedback
@@ -184,15 +199,11 @@ The app includes **300+ carefully curated minimal pairs** (600+ words):
 ## Known Issues & Limitations
 
 - **Gemini Free Tier**: Very restrictive (15 RPM, 1,500/day) - use OpenAI for production
-- **Speech Recognition**: Planned feature, not yet implemented
-- **Offline Mode**: Requires internet for AI generation (static pairs work offline)
+- **Speech Recognition**: Performance varies by device microphone quality
 
 ## Future Enhancements
 
-- [ ] Speech recognition for pronunciation feedback
-- [ ] Gamification (badges, achievements, leaderboards)
 - [ ] Parent/teacher dashboard
-- [ ] Offline mode with pre-generated pairs
 - [ ] Multi-language support
 - [ ] Dark mode
 - [ ] Tablet optimization
@@ -208,7 +219,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Minimal pairs methodology from linguistics research
-- Unsplash for placeholder images
+- placehold.co for reliable placeholder images
 - OpenAI and Google for AI APIs
 - Flutter team for the amazing framework
 

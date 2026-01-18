@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../services/gemini_service.dart';
 import '../services/openai_service.dart';
+import '../services/cache_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -55,7 +56,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _selectedProvider = prefs.getString('ai_provider') ?? 'openai';
       _geminiApiKeyController.text = prefs.getString('gemini_api_key') ?? '';
       _openaiApiKeyController.text = prefs.getString('openai_api_key') ?? '';
-      _selectedGeminiModel = prefs.getString('gemini_model') ?? 'gemini-2.0-flash';
+      _selectedGeminiModel =
+          prefs.getString('gemini_model') ?? 'gemini-2.0-flash';
       _selectedOpenAIModel = prefs.getString('openai_model') ?? 'gpt-3.5-turbo';
       _isLoading = false;
     });
@@ -64,11 +66,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('ai_provider', _selectedProvider);
-    await prefs.setString('gemini_api_key', _geminiApiKeyController.text.trim());
+    await prefs.setString(
+        'gemini_api_key', _geminiApiKeyController.text.trim());
     await prefs.setString('gemini_model', _selectedGeminiModel);
-    await prefs.setString('openai_api_key', _openaiApiKeyController.text.trim());
+    await prefs.setString(
+        'openai_api_key', _openaiApiKeyController.text.trim());
     await prefs.setString('openai_model', _selectedOpenAIModel);
-    
+
     // Reinitialize the selected service
     try {
       if (_selectedProvider == 'gemini') {
@@ -82,14 +86,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           model: _selectedOpenAIModel,
         );
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✅ Settings saved! Using ${_selectedProvider == 'gemini' ? 'Gemini' : 'OpenAI'}'),
+            content: Text(
+                '✅ Settings saved! Using ${_selectedProvider == 'gemini' ? 'Gemini' : 'OpenAI'}'),
             backgroundColor: AppTheme.successGreen,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -100,7 +106,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             content: Text('⚠️ ${e.toString().replaceAll('Exception: ', '')}'),
             backgroundColor: Colors.orange,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -112,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-           gradient: AppTheme.mainBackgroundGradient,
+          gradient: AppTheme.mainBackgroundGradient,
         ),
         child: SafeArea(
           child: _isLoading
@@ -160,7 +167,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
@@ -173,11 +181,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       items: const [
                                         DropdownMenuItem(
                                           value: 'openai',
-                                          child: Text('OpenAI (Recommended)', style: TextStyle(fontSize: 14)),
+                                          child: Text('OpenAI (Recommended)',
+                                              style: TextStyle(fontSize: 14)),
                                         ),
                                         DropdownMenuItem(
                                           value: 'gemini',
-                                          child: Text('Google Gemini', style: TextStyle(fontSize: 14)),
+                                          child: Text('Google Gemini',
+                                              style: TextStyle(fontSize: 14)),
                                         ),
                                       ],
                                       onChanged: (value) {
@@ -208,9 +218,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       vertical: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                                      color: AppTheme.primaryBlue
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
+                                      border: Border.all(
+                                          color: AppTheme.primaryBlue
+                                              .withValues(alpha: 0.3)),
                                     ),
                                     child: const SelectableText(
                                       'https://platform.openai.com/api-keys',
@@ -247,7 +260,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         ),
                                         onPressed: () {
                                           setState(() {
-                                            _obscureOpenAIKey = !_obscureOpenAIKey;
+                                            _obscureOpenAIKey =
+                                                !_obscureOpenAIKey;
                                           });
                                         },
                                       ),
@@ -260,7 +274,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(12),
@@ -275,7 +290,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             value: model['id'],
                                             child: Text(
                                               model['name']!,
-                                              style: const TextStyle(fontSize: 14),
+                                              style:
+                                                  const TextStyle(fontSize: 14),
                                             ),
                                           );
                                         }).toList(),
@@ -307,9 +323,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       vertical: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                                      color: AppTheme.primaryBlue
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
+                                      border: Border.all(
+                                          color: AppTheme.primaryBlue
+                                              .withValues(alpha: 0.3)),
                                     ),
                                     child: const SelectableText(
                                       'https://aistudio.google.com/apikey',
@@ -346,7 +365,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         ),
                                         onPressed: () {
                                           setState(() {
-                                            _obscureGeminiKey = !_obscureGeminiKey;
+                                            _obscureGeminiKey =
+                                                !_obscureGeminiKey;
                                           });
                                         },
                                       ),
@@ -359,7 +379,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(12),
@@ -374,7 +395,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             value: model['id'],
                                             child: Text(
                                               model['name']!,
-                                              style: const TextStyle(fontSize: 14),
+                                              style:
+                                                  const TextStyle(fontSize: 14),
                                             ),
                                           );
                                         }).toList(),
@@ -399,8 +421,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               width: double.infinity,
                               child: ElevatedButton(
                                 style: AppTheme.primaryButtonStyle.copyWith(
-                                   backgroundColor: WidgetStateProperty.all(AppTheme.successGreen),
-                                   foregroundColor: WidgetStateProperty.all(Colors.white),
+                                  backgroundColor: WidgetStateProperty.all(
+                                      AppTheme.successGreen),
+                                  foregroundColor:
+                                      WidgetStateProperty.all(Colors.white),
                                 ),
                                 onPressed: _saveSettings,
                                 child: const Row(
@@ -431,13 +455,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: GeminiService.instance.isInitialized
-                                      ? AppTheme.successGreen.withValues(alpha: 0.2)
+                                      ? AppTheme.successGreen
+                                          .withValues(alpha: 0.2)
                                       : Colors.orange.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                     color: GeminiService.instance.isInitialized
-                                      ? AppTheme.successGreen.withValues(alpha: 0.5)
-                                      : Colors.orange.withValues(alpha: 0.5),
+                                    color: GeminiService.instance.isInitialized
+                                        ? AppTheme.successGreen
+                                            .withValues(alpha: 0.5)
+                                        : Colors.orange.withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Row(
@@ -447,9 +473,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       GeminiService.instance.isInitialized
                                           ? Icons.check_circle
                                           : Icons.warning_rounded,
-                                      color: GeminiService.instance.isInitialized
-                                          ? AppTheme.successGreen
-                                          : Colors.orange,
+                                      color:
+                                          GeminiService.instance.isInitialized
+                                              ? AppTheme.successGreen
+                                              : Colors.orange,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
@@ -458,9 +485,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           ? 'AI Connected'
                                           : 'AI Not Configured',
                                       style: TextStyle(
-                                        color: GeminiService.instance.isInitialized
-                                            ? AppTheme.successGreen
-                                            : Colors.orange,
+                                        color:
+                                            GeminiService.instance.isInitialized
+                                                ? AppTheme.successGreen
+                                                : Colors.orange,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -468,15 +496,83 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                               ),
                             ),
+
+                          const SizedBox(height: 24),
+                          // Offline Content Card
+                          _buildSettingsCard(
+                              title: '💾 Offline Content',
+                              children: [
+                                const Text(
+                                  'AI-generated words are cached for offline use.',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppTheme.mediumText,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                      side: const BorderSide(color: Colors.red),
+                                      padding:
+                                          const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                    onPressed: _clearCache,
+                                    icon: const Icon(Icons.delete_outline),
+                                    label: const Text('Clear Offline Content'),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                ],
+              ),
         ),
       ),
     );
+  }
+
+  Future<void> _clearCache() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Offline Content?'),
+        content: const Text(
+          'This will remove all AI-generated words stored on your device. '
+          'You can generate them again later.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Clear', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await CacheService.instance.clearCache();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Offline content cleared'),
+            backgroundColor: AppTheme.darkText,
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildSettingsCard({
