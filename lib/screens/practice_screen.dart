@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../config/theme.dart';
 import '../data/word_pairs_data.dart';
 import '../models/word_pair.dart';
@@ -42,6 +43,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
   late TTSService _ttsService;
   late STTService _sttService;
   StreamSubscription<String>? _sttSubscription;
+  StreamSubscription<String>? _sttStatusSubscription;
 
   @override
   void initState() {
@@ -54,13 +56,63 @@ class _PracticeScreenState extends State<PracticeScreen> {
     _sttService = context.read<STTService>();
     
     _sttSubscription = _sttService.recognizedWords.listen(_onSpeechResult);
+    _sttStatusSubscription = _sttService.statusStream.listen(_onSTTStatus);
+    
+    // Check permissions before initializing
+    _checkPermissionAndInitialize();
+  }
+
+  Future<void> _checkPermissionAndInitialize() async {
+    final status = await Permission.microphone.request();
+    if (status.isGranted) {
+      _sttService.initialize();
+    } else if (status.isPermanentlyDenied) {
+      _showPermissionDialog();
+    }
+  }
+
+  void _showPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Microphone Required'),
+        content: const Text('This app needs microphone access to hear your pronunciation. Please enable it in settings.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   void dispose() {
     _sttSubscription?.cancel();
+    _sttStatusSubscription?.cancel();
     _cooldownTimer?.cancel();
     super.dispose();
+  }
+
+  void _onSTTStatus(String status) {
+    if (!mounted) return;
+    
+    if (status == 'listening') {
+      setState(() => _isListening = true);
+    } else if (status == 'notListening' || status == 'done') {
+      setState(() => _isListening = false);
+    } else if (status == 'error') {
+      setState(() => _isListening = false);
+      _showMessage('Microphone error. Please check permissions.');
+    }
   }
 
   void _selectRandomTarget() {

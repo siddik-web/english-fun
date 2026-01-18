@@ -9,8 +9,11 @@ class STTService {
   
   final StreamController<String> _recognizedWordsController = 
       StreamController<String>.broadcast();
+  final StreamController<String> _statusController = 
+      StreamController<String>.broadcast();
 
   Stream<String> get recognizedWords => _recognizedWordsController.stream;
+  Stream<String> get statusStream => _statusController.stream;
   bool get isListening => _isListening;
 
   Future<bool> initialize() async {
@@ -19,10 +22,14 @@ class STTService {
     _isInitialized = await _speechToText.initialize(
       onError: (error) {
         _isListening = false;
+        _statusController.add('error');
       },
       onStatus: (status) {
+        _statusController.add(status);
         if (status == 'done' || status == 'notListening') {
           _isListening = false;
+        } else if (status == 'listening') {
+          _isListening = true;
         }
       },
     );
@@ -33,7 +40,11 @@ class STTService {
   /// Start listening for speech
   Future<void> startListening() async {
     if (!_isInitialized) {
-      await initialize();
+      bool working = await initialize();
+      if (!working) {
+        _statusController.add('error');
+        return;
+      }
     }
     
     if (_isInitialized && !_isListening) {
@@ -119,5 +130,6 @@ class STTService {
   void dispose() {
     _speechToText.stop();
     _recognizedWordsController.close();
+    _statusController.close();
   }
 }

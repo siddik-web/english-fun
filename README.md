@@ -27,7 +27,7 @@ A Flutter mobile application designed for Grade 1 students to practice English p
 
 ### 🔊 Audio Features
 - **Text-to-Speech**: Native pronunciation for all words
-- **Speech Recognition**: Record and compare pronunciation (planned)
+- **Speech Recognition**: Record your voice and get instant feedback!
 - **Audio Hints**: Mouth position guidance for each sound
 
 ### 📊 Progress Tracking
@@ -41,6 +41,7 @@ A Flutter mobile application designed for Grade 1 students to practice English p
 - Flutter SDK 3.38.7 or higher
 - Android Studio / VS Code
 - Android device or emulator
+- **Microphone Permission**: Required for speech practice
 
 ### Installation
 
@@ -113,7 +114,7 @@ lib/
 │   ├── gemini_service.dart     # Google Gemini integration
 │   ├── openai_service.dart     # OpenAI integration
 │   ├── tts_service.dart        # Text-to-speech
-│   ├── stt_service.dart        # Speech-to-text (planned)
+│   ├── stt_service.dart        # Speech-to-text integration
 │   └── progress_provider.dart  # Progress tracking
 ├── widgets/
 │   ├── category_card.dart      # Category selection cards
