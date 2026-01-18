@@ -9,6 +9,11 @@ A Flutter mobile application designed for Grade 1 students to practice English p
 - **Letter Sounds** - Learn consonant distinctions (F/V, P/B, T/D, S/Z, K/G, L/R, etc.)
 - **Tricky Pairs** - Master challenging minimal pairs (A/E, I/E, O/U, consonant endings)
 
+### 🖼️ Reliable Visuals
+- **Dynamic Images**: All words feature consistent, reliable visual aids
+- **Offline Capable**: Text-based generation ensures no broken links
+- **Clear Text**: Large, readable text on every image card
+
 ### 🤖 AI-Powered Word Generation
 - **Dual AI Support**: Choose between OpenAI (GPT-3.5/4) or Google Gemini
 - **Smart Generation**: AI creates contextual minimal pairs on-demand
@@ -97,7 +102,7 @@ lib/
 ├── config/
 │   └── theme.dart              # App theme and colors
 ├── data/
-│   └── word_pairs_data.dart    # 100+ static word pairs
+│   └── word_pairs_data.dart    # 300+ static word pairs
 ├── models/
 │   └── word_pair.dart          # WordPair data model
 ├── screens/
@@ -133,18 +138,18 @@ flutter test
 **Test Coverage**:
 - ✅ App initialization
 - ✅ Navigation flows
-- ✅ Word pairs data (100+ pairs)
+- ✅ Word pairs data (300+ pairs)
 - ✅ WordPair model methods
 - ✅ Service singletons
 - ✅ Edge cases
 
 ## Word Pairs Content
 
-The app includes **100+ carefully curated minimal pairs**:
+The app includes **300+ carefully curated minimal pairs** (600+ words):
 
-- **45+ Vowel Fun pairs**: Short/long vowels across all vowel sounds
-- **40+ Letter Sounds pairs**: Consonant distinctions (voiced/unvoiced, similar sounds)
-- **35+ Tricky Pairs**: Advanced challenges (mixed vowels, consonant endings, double letters)
+- **100+ Vowel Fun pairs**: Short/long vowels across all vowel sounds
+- **100+ Letter Sounds pairs**: Consonant distinctions (voiced/unvoiced, similar sounds)
+- **100+ Tricky Pairs**: Advanced challenges (mixed vowels, consonant endings, double letters)
 
 ## Technologies Used
 
