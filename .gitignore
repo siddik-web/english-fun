@@ -46,3 +46,10 @@ app.*.map.json
 
 # Environment variables (API keys)
 .env
+
+# pubspec.lock
+pubspec.lock
+
+# build_log.txt
+build_log.txt
+
